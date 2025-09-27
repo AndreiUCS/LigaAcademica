@@ -13,7 +13,7 @@ public class ListaAlunos {
         } else {
             Nodo<Aluno> atual = inicio;
             while (atual.getProximo() != null &&
-                   aluno.getNome().compareToIgnoreCase(atual.getProximo().getElemento().getNome()) > 0) { //Compara
+                   aluno.getNome().compareToIgnoreCase(atual.getProximo().getElemento().getNome()) > 0) { 
                 atual = atual.getProximo();
             }
             novo.setProximo(atual.getProximo()); 
@@ -46,7 +46,6 @@ public class ListaAlunos {
         if (posicao < 1 || posicao > tamanho) {
             throw new IllegalArgumentException("Posição inválida");
         }
-
         if (posicao == 1) {
             inicio = inicio.getProximo();
         } else {
