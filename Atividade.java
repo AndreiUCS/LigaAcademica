@@ -1,56 +1,60 @@
 public class Atividade {
-    private String nome;
-    private String descricao;
 
-    // Lista ligada de participantes
-    private Nodo<Participante> participantes;
+    private String nomeLiga;
+    private String local; // endereço ou link
+    private Nodo<Aluno> participantesHeader;
     private int quantidadeParticipantes;
 
-    public Atividade(String nome, String descricao) {
-        this.nome = nome;
-        this.descricao = descricao;
-        this.participantes = null;
+    public Atividade(String nomeLiga, String local) {
+        this.nomeLiga = nomeLiga;
+        this.local = local;
+        this.participantesHeader = new Nodo<>(null); // header da lista de participantes
         this.quantidadeParticipantes = 0;
     }
 
-    public String getNome() {
-        return nome;
+    public String getNomeLiga() {
+        return nomeLiga;
     }
 
-    public String getDescricao() {
-        return descricao;
+    public String getLocal() {
+        return local;
     }
 
     public int getQuantidadeParticipantes() {
         return quantidadeParticipantes;
     }
 
-    // Insere participante no final da lista (sem repetição)
-    public boolean adicionarParticipante(Participante p) {
-        if (participanteExiste(p)) {
-            return false; // Já está inscrito nesta atividade
+    public boolean adicionarParticipante(Aluno aluno) {
+        if (participanteExiste(aluno.getCodigo())) {
+            return false;
         }
 
-        Nodo<Participante> novo = new Nodo<>(p);
-
-        if (participantes == null) {
-            participantes = novo;
-        } else {
-            Nodo<Participante> atual = participantes;
-            while (atual.getProximo() != null) {
-                atual = atual.getProximo();
-            }
-            atual.setProximo(novo);
-        }
+        Nodo<Aluno> novo = new Nodo<>(aluno);
+        novo.setProximo(participantesHeader.getProximo());
+        participantesHeader.setProximo(novo);
         quantidadeParticipantes++;
         return true;
     }
 
-    // Verifica se participante já está na lista desta atividade
-    public boolean participanteExiste(Participante p) {
-        Nodo<Participante> atual = participantes;
+    public void removerParticipantePorCodigo(int codigo) {
+        Nodo<Aluno> ant = participantesHeader;
+        Nodo<Aluno> atual = participantesHeader.getProximo();
+
         while (atual != null) {
-            if (atual.getElemento().getCodigo() == p.getCodigo()) {
+            if (atual.getElemento().getCodigo() == codigo) {
+                ant.setProximo(atual.getProximo());
+                quantidadeParticipantes--;
+                return;
+            }
+            ant = atual;
+            atual = atual.getProximo();
+        }
+    }
+
+    public boolean participanteExiste(int codigo) {
+        Nodo<Aluno> atual = participantesHeader.getProximo();
+        while (atual != null) {
+            if (atual.getElemento().getCodigo() == codigo) {
                 return true;
             }
             atual = atual.getProximo();
@@ -58,9 +62,12 @@ public class Atividade {
         return false;
     }
 
-    // Exibe os participantes
     public void exibeParticipantes() {
-        Nodo<Participante> atual = participantes;
+        Nodo<Aluno> atual = participantesHeader.getProximo();
+        if (atual == null) {
+            System.out.println("Nenhum participante inscrito.");
+            return;
+        }
         while (atual != null) {
             System.out.println(" - " + atual.getElemento());
             atual = atual.getProximo();
@@ -69,6 +76,7 @@ public class Atividade {
 
     @Override
     public String toString() {
-        return "Atividade: " + nome + "\nDescrição: " + descricao + "\nParticipantes: " + quantidadeParticipantes;
+        return "Liga: " + nomeLiga + "\nLocal: " + local +
+                "\nParticipantes inscritos: " + quantidadeParticipantes;
     }
 }

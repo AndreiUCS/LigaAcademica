@@ -1,88 +1,61 @@
 public class AgendaLigas {
-
-    // Lista ligada de atividades
-    private Nodo<Atividade> atividades;
+    private Nodo<Atividade> headerAtividades;
     private int quantidadeAtividades;
+    private ListaAlunos cadastro;
 
-    // Lista ligada de participantes cadastrados (para controle)
-    private Nodo<Participante> participantesCadastrados;
-    private int quantidadeParticipantes;
-
-    public AgendaLigas() {
-        atividades = null;
+    public AgendaLigas(ListaAlunos cadastro) {
+        this.cadastro = cadastro;
+        headerAtividades = new Nodo<>(null); // header de atividades
         quantidadeAtividades = 0;
-        participantesCadastrados = null;
-        quantidadeParticipantes = 0;
     }
 
-    // Cadastrar participante no sistema (antes de inserir em atividade)
-    public boolean cadastrarParticipante(int codigo, String nome) {
-        if (buscarParticipantePorCodigo(codigo) != null) {
-            return false; // Já existe participante com esse código
-        }
-        Participante p = new Participante(codigo, nome);
-        Nodo<Participante> novo = new Nodo<>(p);
-        novo.setProximo(participantesCadastrados);
-        participantesCadastrados = novo;
-        quantidadeParticipantes++;
-        return true;
-    }
-
-    // Insere uma nova atividade na agenda (no início da lista)
-    public void insereAtividade(String nome, String descricao) {
-        Atividade nova = new Atividade(nome, descricao);
+    public void insereAtividade(String nomeLiga, String local) {
+        Atividade nova = new Atividade(nomeLiga, local);
         Nodo<Atividade> novoNodo = new Nodo<>(nova);
-        novoNodo.setProximo(atividades);
-        atividades = novoNodo;
+        novoNodo.setProximo(headerAtividades.getProximo());
+        headerAtividades.setProximo(novoNodo);
         quantidadeAtividades++;
     }
 
-    // Remove atividade pelo nome (primeira ocorrência)
-    public boolean removeAtividade(String nomeAtividade) {
-        Nodo<Atividade> atual = atividades;
-        Nodo<Atividade> anterior = null;
+    public boolean removeAtividade(String nomeLiga) {
+        Nodo<Atividade> ant = headerAtividades;
+        Nodo<Atividade> atual = headerAtividades.getProximo();
 
         while (atual != null) {
-            if (atual.getElemento().getNome().equalsIgnoreCase(nomeAtividade)) {
-                if (anterior == null) {
-                    atividades = atual.getProximo();
-                } else {
-                    anterior.setProximo(atual.getProximo());
-                }
+            if (atual.getElemento().getNomeLiga().equalsIgnoreCase(nomeLiga)) {
+                ant.setProximo(atual.getProximo());
                 quantidadeAtividades--;
                 return true;
             }
-            anterior = atual;
+            ant = atual;
             atual = atual.getProximo();
         }
-        return false; // Não encontrou a atividade
+        return false;
     }
 
-    // Insere participante em atividade (se estiver cadastrado e não inscrito em outra)
-    public boolean insereParticipante(String nomeAtividade, int codigoParticipante) {
-        Participante p = buscarParticipantePorCodigo(codigoParticipante);
-        if (p == null) {
-            System.out.println("Participante não cadastrado.");
+    public boolean insereParticipante(String nomeLiga, int codigoAluno) {
+        Aluno aluno = cadastro.buscarPorCodigo(codigoAluno);
+        if (aluno == null) {
+            System.out.println("Aluno não cadastrado.");
             return false;
         }
 
-        if (participanteInscritoEmAlgumaAtividade(p)) {
-            System.out.println("Participante já está inscrito em outra atividade.");
+        if (participanteInscritoEmAlgumaAtividade(codigoAluno)) {
+            System.out.println("Aluno já está inscrito em outra atividade.");
             return false;
         }
 
-        Atividade atividade = buscarAtividadePorNome(nomeAtividade);
+        Atividade atividade = buscarAtividadePorNome(nomeLiga);
         if (atividade == null) {
             System.out.println("Atividade não encontrada.");
             return false;
         }
 
-        return atividade.adicionarParticipante(p);
+        return atividade.adicionarParticipante(aluno);
     }
 
-    // Consulta uma atividade pelo nome e exibe suas informações
-    public void consultaAtividade(String nomeAtividade) {
-        Atividade a = buscarAtividadePorNome(nomeAtividade);
+    public void consultaAtividade(String nomeLiga) {
+        Atividade a = buscarAtividadePorNome(nomeLiga);
         if (a == null) {
             System.out.println("Atividade não encontrada.");
             return;
@@ -92,60 +65,42 @@ public class AgendaLigas {
         a.exibeParticipantes();
     }
 
-    // Consulta quantidades de participantes por atividade
     public void consultaQuantidades() {
-        Nodo<Atividade> atual = atividades;
+        Nodo<Atividade> atual = headerAtividades.getProximo();
         while (atual != null) {
-            System.out.println("Atividade: " + atual.getElemento().getNome()
-                    + " | Participantes: " + atual.getElemento().getQuantidadeParticipantes());
+            System.out.println("Atividade: " + atual.getElemento().getNomeLiga() +
+                    " | Participantes: " + atual.getElemento().getQuantidadeParticipantes());
             atual = atual.getProximo();
         }
     }
 
-    // Lista todas as atividades da agenda
     public void consultaTodasAtividades() {
-        if (atividades == null) {
+        Nodo<Atividade> atual = headerAtividades.getProximo();
+        if (atual == null) {
             System.out.println("Nenhuma atividade cadastrada.");
             return;
         }
-        Nodo<Atividade> atual = atividades;
         System.out.println("Atividades cadastradas:");
         while (atual != null) {
-            System.out.println("- " + atual.getElemento().getNome());
+            System.out.println("- " + atual.getElemento().getNomeLiga());
             atual = atual.getProximo();
         }
     }
 
-    // Consulta participantes de uma atividade específica
-    public void consultaParticipantes(String nomeAtividade) {
-        Atividade a = buscarAtividadePorNome(nomeAtividade);
+    public void consultaParticipantes(String nomeLiga) {
+        Atividade a = buscarAtividadePorNome(nomeLiga);
         if (a == null) {
             System.out.println("Atividade não encontrada.");
             return;
         }
-        System.out.println("Participantes da atividade '" + a.getNome() + "':");
+        System.out.println("Participantes da atividade '" + a.getNomeLiga() + "':");
         a.exibeParticipantes();
     }
 
-    // --- MÉTODOS AUXILIARES ---
-
-    // Busca participante cadastrado pelo código
-    private Participante buscarParticipantePorCodigo(int codigo) {
-        Nodo<Participante> atual = participantesCadastrados;
-        while (atual != null) {
-            if (atual.getElemento().getCodigo() == codigo) {
-                return atual.getElemento();
-            }
-            atual = atual.getProximo();
-        }
-        return null;
-    }
-
-    // Busca atividade pelo nome
     private Atividade buscarAtividadePorNome(String nome) {
-        Nodo<Atividade> atual = atividades;
+        Nodo<Atividade> atual = headerAtividades.getProximo();
         while (atual != null) {
-            if (atual.getElemento().getNome().equalsIgnoreCase(nome)) {
+            if (atual.getElemento().getNomeLiga().equalsIgnoreCase(nome)) {
                 return atual.getElemento();
             }
             atual = atual.getProximo();
@@ -153,15 +108,23 @@ public class AgendaLigas {
         return null;
     }
 
-    // Verifica se participante está inscrito em alguma atividade
-    private boolean participanteInscritoEmAlgumaAtividade(Participante p) {
-        Nodo<Atividade> atual = atividades;
+    private boolean participanteInscritoEmAlgumaAtividade(int codigoAluno) {
+        Nodo<Atividade> atual = headerAtividades.getProximo();
         while (atual != null) {
-            if (atual.getElemento().participanteExiste(p)) {
+            if (atual.getElemento().participanteExiste(codigoAluno)) {
                 return true;
             }
             atual = atual.getProximo();
         }
         return false;
+    }
+
+    // Remover aluno de todas as atividades (quando sair do cadastro)
+    public void removerAlunoDeTodasAtividades(int codigoAluno) {
+        Nodo<Atividade> atual = headerAtividades.getProximo();
+        while (atual != null) {
+            atual.getElemento().removerParticipantePorCodigo(codigoAluno);
+            atual = atual.getProximo();
+        }
     }
 }
