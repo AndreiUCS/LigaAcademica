@@ -5,7 +5,7 @@ public class AgendaLigas {
 
     public AgendaLigas(ListaAlunos cadastro) {
         this.cadastro = cadastro;
-        headerAtividades = new Nodo<>(null); // header de atividades
+        headerAtividades = new Nodo<>(null);
         quantidadeAtividades = 0;
     }
 
@@ -119,12 +119,50 @@ public class AgendaLigas {
         return false;
     }
 
-    // Remover aluno de todas as atividades (quando sair do cadastro)
     public void removerAlunoDeTodasAtividades(int codigoAluno) {
         Nodo<Atividade> atual = headerAtividades.getProximo();
         while (atual != null) {
             atual.getElemento().removerParticipantePorCodigo(codigoAluno);
             atual = atual.getProximo();
         }
+    }
+
+    public void relatorioMaiorMenorAtividade() {
+        if (headerAtividades.getProximo() == null) {
+            System.out.println("Nenhuma atividade cadastrada.");
+            return;
+        }
+
+        Nodo<Atividade> atual = headerAtividades.getProximo();
+        Atividade maior = atual.getElemento();
+        Atividade menor = atual.getElemento();
+
+        while (atual != null) {
+            Atividade a = atual.getElemento();
+            if (a.getQuantidadeParticipantes() > maior.getQuantidadeParticipantes()) {
+                maior = a;
+            }
+            if (a.getQuantidadeParticipantes() < menor.getQuantidadeParticipantes()) {
+                menor = a;
+            }
+            atual = atual.getProximo();
+        }
+
+        System.out.println("\n===== 📈 RELATÓRIO DE ATIVIDADES 📉 =====");
+
+        System.out.println("\n📈 ATIVIDADE COM MAIS PARTICIPANTES:");
+        exibirDetalhesAtividade(maior);
+
+    
+        System.out.println("\n📉 ATIVIDADE COM MENOS PARTICIPANTES:");
+        exibirDetalhesAtividade(menor);
+    }
+    
+    private void exibirDetalhesAtividade(Atividade atividade) {
+        System.out.println("Nome: " + atividade.getNomeLiga());
+        System.out.println("Local: " + atividade.getLocal());
+        System.out.println("Quantidade de participantes: " + atividade.getQuantidadeParticipantes());
+        System.out.println("Lista de participantes:");
+        atividade.exibeParticipantes();
     }
 }

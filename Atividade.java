@@ -8,7 +8,7 @@ public class Atividade {
     public Atividade(String nomeLiga, String local) {
         this.nomeLiga = nomeLiga;
         this.local = local;
-        this.participantesHeader = new Nodo<>(null); // header da lista de participantes
+        this.participantesHeader = new Nodo<>(null);
         this.quantidadeParticipantes = 0;
     }
 
