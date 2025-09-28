@@ -3,11 +3,10 @@ public class ListaAlunos {
     private int tamanho;
 
     public ListaAlunos() {
-        header = new Nodo<>(null); // nó cabeçalho
+        header = new Nodo<>(null);
         tamanho = 0;
     }
 
-    // Inserção ordenada por nome
     public void insereAlunoOrdenado(int codigo, String nome, String curso) {
         Aluno aluno = new Aluno(codigo, nome, curso);
         Nodo<Aluno> novo = new Nodo<>(aluno);
@@ -25,7 +24,6 @@ public class ListaAlunos {
         tamanho++;
     }
 
-    // Remove aluno por código
     public boolean removeAlunoPorCodigo(int codigo) {
         Nodo<Aluno> ant = header;
         Nodo<Aluno> atual = header.getProximo();
@@ -42,7 +40,6 @@ public class ListaAlunos {
         return false;
     }
 
-    // Remove aluno por nome
     public void removeAlunoPorNome(String nome) {
         Nodo<Aluno> ant = header;
         Nodo<Aluno> atual = header.getProximo();
@@ -58,7 +55,6 @@ public class ListaAlunos {
         }
     }
 
-    // Exibe os alunos
     public void exibeListaEstudantes() {
         Nodo<Aluno> atual = header.getProximo();
         while (atual != null) {
@@ -70,7 +66,6 @@ public class ListaAlunos {
         }
     }
 
-    // Buscar aluno por código
     public Aluno buscarPorCodigo(int codigo) {
         Nodo<Aluno> atual = header.getProximo();
         while (atual != null) {
@@ -82,7 +77,6 @@ public class ListaAlunos {
         return null;
     }
 
-    // Buscar aluno por nome
     public Aluno buscarPorNome(String nome) {
         Nodo<Aluno> atual = header.getProximo();
         while (atual != null) {
